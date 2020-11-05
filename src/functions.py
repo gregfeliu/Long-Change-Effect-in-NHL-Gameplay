@@ -68,9 +68,10 @@ def get_category_and_period_avg(category):
 
 def generate_three_proposals(category_avg_df):
     # get the sum of the category under 3 diff proposals: no change, double long change, triple long change
+    ratio_3_1 = category_avg_df.iloc[2] / category_avg_df.iloc[0]
     sum_no_change = round(sum(category_avg_df.values), 2)
-    sum_double_long = round(category_avg_df.iloc[0] + (category_avg_df.iloc[1] * 2), 2)
-    sum_triple_change = round(category_avg_df.iloc[1] * 3, 2)
+    sum_double_long = round(category_avg_df.iloc[1] + category_avg_df.iloc[0] + (category_avg_df.iloc[1] * ratio_3_1), 2)
+    sum_triple_change = round((category_avg_df.iloc[1] * 2) + (category_avg_df.iloc[1] * ratio_3_1), 2)
     all_proposals = {"No_Change": sum_no_change, 
                      "Two_Long_Changes": sum_double_long,
                      "Three_Long_Changes": sum_triple_change}

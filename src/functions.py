@@ -2,12 +2,69 @@ from config import *
 import mysql.connector
 import seaborn as sns
 import pandas as pd
+from pathlib import Path, PureWindowsPath
 
 
+######## SQL Table Creation Functions ########
+def get_col_info(df):
+    """
+    Collects information about columns in a dataframe for use in "create table" statements. 
+    It returns the maximum number of characters needed for VARCHAR and fills in nan values.
+    -
+    Input: 
+    df: a pandas dataframe.
+    -
+    Output:
+    col_names: a list of all of the column names for that dataframe.
+    sql_col_types: a list, of equal length to the col_names list, that has all of the SQL equivalent datatypes.
+    """
+    # initializing the replacement dictionary and the column names
+    replacement_dict = {"int64": "INT", "float64": "FLOAT", "bool":'BIT', "object":'VARCHAR'}
+    col_names = list(df.columns)
+    # replacing the pandas datatypes to SQL datatypes
+    col_types = [x for x in df.dtypes]
+    sql_col_types = [replacement_dict[str(x)] for x in col_types]
+    # handling case where datatype is VARCHAR since it needs to know how many characters need to be stored
+    for idx, x in enumerate(sql_col_types):
+        if x == 'VARCHAR':
+            if df[col_names[idx]].isnull().values.any() == True:
+                df = df.fillna("")
+            max_col_len = len(max(df[col_names[idx]], key=len))
+            sql_col_types[idx] = x + "(" + str(max_col_len) + ")"
+    return col_names, sql_col_types
 
+def all_create_table_statements(df_names, df_files):
+    """
+    Creates "create table" statements for every dataframe. 
+    They are stored in a list and copy and pasted into Google Cloud Platform in order to store the SQL table.
+    -
+    Input: 
+    df_names: a list of names for the dataframes.
+    df_diles: the file locations for all of the dataframes.
+    -
+    Output:
+    create_table_statement_list: a list with full "create table" statements for each one of the tables.
+    """
+    create_table_statement_list = []
+    for idx, df in enumerate(df_files):
+        # initializing the values used with that specific table
+        df_name = df_names[idx]
+        print(f"Table name is {df_name}")
+        df_dataframe = pd.read_csv(df)
+        df_columns, df_dtypes = get_col_info(df_dataframe)
+        # building the statement
+        column_section = f"CREATE TABLE {df_name} ("
+        for idx1, x in enumerate(df_columns):
+            col_row = str(x) + " " + df_dtypes[idx1] + ", "
+            column_section += col_row
+        final_column_section = column_section[:-2] + ");"
+        create_table_statement_list.append(final_column_section)
+    return create_table_statement_list
+
+######## SQL Query Functions ########
 def run_query(sql_query):
     """
-    Makes a connection to the Google Cloud Platform, and executes the query
+    Makes a connection to the Google Cloud Platform, and executes the query.
     -
     Input: 
     sql_query: a string with the sql query 
@@ -44,21 +101,6 @@ def get_total_period_sum(event_type):
 """
     variable_by_period_query_result = run_query(variable_by_period)
     return variable_by_period_query_result
-
-def make_barplot_of_variable_by_period(query_result):
-    """
-    Makes a barplot of the query that has a sum of the event grouped by period
-    -
-    Input:
-    query_result: The result of a query, a list of lists
-    -
-    Output:
-    barplot: a seaborn barplot
-    """
-    barplot = sns.barplot(x = [i[0] for i in query_result],
-                          y = [i[1] for i in query_result], 
-                          ci=None)
-    return barplot
 
 def get_raw_data(event_type):
     """
@@ -107,6 +149,22 @@ def get_shift_len_by_position(position):
     """
     query_result = run_query(query)
     return query_result
+
+######## Analyzing Functions ########
+def make_barplot_of_variable_by_period(query_result):
+    """
+    Makes a barplot of the query that has a sum of the event grouped by period
+    -
+    Input:
+    query_result: The result of a query, a list of lists
+    -
+    Output:
+    barplot: a seaborn barplot
+    """
+    barplot = sns.barplot(x = [i[0] for i in query_result],
+                          y = [i[1] for i in query_result], 
+                          ci=None)
+    return barplot
 
 def get_category_and_period_avg(category):
     """

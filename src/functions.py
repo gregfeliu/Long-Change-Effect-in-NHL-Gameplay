@@ -2,7 +2,6 @@ from config import *
 import mysql.connector
 import seaborn as sns
 import pandas as pd
-from pathlib import Path, PureWindowsPath
 
 
 ######## SQL Table Creation Functions ########

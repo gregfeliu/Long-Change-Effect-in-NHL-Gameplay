@@ -1,7 +1,7 @@
 # The Long Change Effect in NHL Gameplay
 
 ## Description
-The goal of this project is to make the case for having **two, or even three, long changes in the NHL**. To convince the reader that this change should happen, **I review stats for 8 season of NHL gameplay and calculate the average stats per game under the two long changes and three long changes scenarios**. To "create" the two scenarios, I add the average value for a stat in the first and second periods in different combinations: for the two long changes, 2 second periods and 1 first period, and for the three long changes, three long changes. Additionally, I scale each third period scenario so that it is in proportion with current third period stats so that the change in game strategy is also represented by the proposed scenarios. 
+The goal of this project is to make the case for having **two, or even three, long changes in the NHL**. To convince the reader that this change should happen, **I review stats for 8 season of NHL gameplay and calculate the average stats per game under the two scenarios**. To "create" the two scenarios, I add the average value for a stat in the first and second periods in different combinations: for the two long changes, two second periods and one first period, and for the three long changes, three long changes. Additionally, I scale each third period scenario so that the proportion between the current third period stats and the first period stats retain the change in game strategy that would also occur in both scenarios. 
 
 ![Graphic showing the long change in hockey](./images/Long-Change-Rink-Graphic.png)
 

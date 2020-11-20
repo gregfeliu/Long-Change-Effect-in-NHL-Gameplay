@@ -27,6 +27,3 @@ The project is described in further detail in a [blog post](https://gregfeliu.me
     - Seaborn
     - pickle 
     - Pandas
-
-
-
